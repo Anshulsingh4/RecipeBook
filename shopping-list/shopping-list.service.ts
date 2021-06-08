@@ -1,45 +1,52 @@
 
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model'
 
+@Injectable()
 export class ShoppingListService {
     ingredientsChanged = new Subject<Ingredient[]>()
-    startedEditing = new Subject<number>()
+    startedEditing = new Subject<string>()
 
-    private ingredients: Ingredient[] = [
-        new Ingredient('Apples', 5),
-        new Ingredient('Oranges', 10)
-    ];
+    constructor(private http: HttpClient) { }
+
+    private ingredients = [];
+    private ingredient = {};
+
+    //     new Ingredient('Apples', 5),
+    //     new Ingredient('Oranges', 10)
+    // ];
 
     getIngredients() {
         return this.ingredients.slice()
     }
 
-    getIngredient(index: number) {
-        return this.ingredients[index]
+    getIngredient(index: string) {
+        this.http.get('http://localhost:3000/getIngredient/' + index).subscribe((res) => {
+            console.log(res)
+            this.ingredient = res;
+        })
     }
 
-    addIngredient(ingredient: Ingredient) {
-        this.ingredients.push(ingredient)
-        this.ingredientsChanged.next(this.ingredients.slice())
+    addIngredient(ingredient) {
+        this.http.post('http://localhost:3000/newShopping', ingredient).subscribe()
+
     }
 
     addIngredients(ingredients: Ingredient[]) {
-        // for (let ingredient of ingredients) {
-        //     this.addIngredients(ingredients)
-        // }
-        this.ingredients.push(...ingredients)
-        this.ingredientsChanged.next(this.ingredients.slice())
+
+        // this.ingredients.push(...ingredients)
+        // this.ingredientsChanged.next(this.ingredients.slice())
     }
 
-    updateIngredient(index: number, newIngredient: Ingredient) {
-        this.ingredients[index] = newIngredient;
-        this.ingredientsChanged.next(this.ingredients.slice())
+    updateIngredient(index: string, newIngredient: Ingredient) {
+        //     this.ingredients[index] = newIngredient;
+        //     this.ingredientsChanged.next(this.ingredients.slice())
     }
 
-    deleteIngredient(index: number) {
-        this.ingredients.splice(index, 1)
-        this.ingredientsChanged.next(this.ingredients.slice())
+    deleteIngredient(index: string) {
+        // this.http.post('http://localhost:3000/deleteIngredient', index).subscribe()
     }
 
 

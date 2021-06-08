@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DoCheck, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from './shopping-list.service';
@@ -8,23 +9,34 @@ import { ShoppingListService } from './shopping-list.service';
   templateUrl: './shopping-list.component.html',
   styleUrls: ['./shopping-list.component.css']
 })
-export class ShoppingListComponent implements OnInit, OnDestroy {
-  ingredients: Ingredient[];
-  private subcription: Subscription
-  constructor(private slService: ShoppingListService) { }
+export class ShoppingListComponent implements OnInit, DoCheck, OnDestroy {
+  public ingredients;
+
+  constructor(private slService: ShoppingListService,
+    private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.ingredients = this.slService.getIngredients()
-    this.subcription = this.slService.ingredientsChanged.subscribe((ingredients: Ingredient[]) => {
-      this.ingredients = ingredients;
+    this.http.get('http://localhost:3000/getShopping').subscribe((res) => {
+      this.ingredients = res;
+      // console.log(this.ingredients)
     })
   }
 
-  onEditItem(index: number) {
+  ngDoCheck() {
+    this.http.get('http://localhost:3000/getShopping').subscribe((res) => {
+      this.ingredients = res;
+    })
+  }
+
+
+
+  onEditItem(index: string) {
     this.slService.startedEditing.next(index)
+    // console.log(index)
+    // this.http.post('http://localhost:3000/editShopping', { index }).subscribe()
+
   }
 
   ngOnDestroy() {
-    this.subcription.unsubscribe()
   }
 }
