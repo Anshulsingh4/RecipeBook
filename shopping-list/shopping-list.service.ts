@@ -14,9 +14,7 @@ export class ShoppingListService {
     private ingredients = [];
     private ingredient = {};
 
-    //     new Ingredient('Apples', 5),
-    //     new Ingredient('Oranges', 10)
-    // ];
+
 
     getIngredients() {
         return this.ingredients.slice()
